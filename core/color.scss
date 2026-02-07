@@ -1,0 +1,67 @@
+$colors: (
+    "base-fg": #111111,
+    "base-bg": #ffffff,
+    "base-layer": #f5f5f5,
+    "base-shadow": #00000033,
+    "contrast-fg": #ffffff,
+    "contrast-bg": #222222,
+    "contrast-layer": #eeeeee,
+    "contrast-shadow": #00000066,
+    "brand-primary": #3366ff,
+    "brand-primary-light": #6699ff,
+    "brand-secondary": #ff9933,
+    "brand-neutral": #888888,
+    "brand-success": #2ca58d,
+    "brand-warning": #e6a23c,
+    "brand-error": #d64545
+);
+
+$opacities: (90, 80, 70, 60, 50, 40, 30, 20, 10, 5);
+
+$properties: (
+    "c-el": "color",
+    "c-bg": "background-color", 
+    "c-bor": "border-color"
+);
+
+:root {
+    @each $name, $color in $colors {
+        --c-#{$name}: #{$color};
+
+        @each $opacity in $opacities {
+            --c-#{$name}-#{$opacity}: rgba(#{red($color)}, #{green($color)}, #{blue($color)}, #{$opacity * 0.01});
+        }
+    }
+}
+
+@each $name, $color in $colors {
+    @each $prop-name, $css-property in $properties {
+        .#{$prop-name}-#{$name} {
+            #{$css-property}: var(--c-#{$name}) #{if($prop-name == "c-bor", !important, null)};
+        }
+
+        @each $opacity in $opacities {
+            .#{$prop-name}-#{$name}-#{$opacity} {
+                #{$css-property}: var(--c-#{$name}-#{$opacity}) #{if($prop-name == "c-bor", !important, null)};
+            }
+        }
+    }
+}
+
+$default-elements: (
+    "h1, h2, h3, h4, h5, h6": (
+        color: "brand-primary"
+    ),
+    "body": (
+        color: "base-fg-90",
+        background-color: "base-bg"
+    )
+);
+
+@each $selector, $styles in $default-elements {
+    #{$selector} {
+        @each $property, $color-name in $styles {
+            #{$property}: var(--c-#{$color-name});
+        }
+    }
+}
