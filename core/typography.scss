@@ -2,13 +2,13 @@
 @use "sass:map";
 @use "sass:list";
 
+$generate-typography-utilities: true !default;
 
-
-@import url("https://fonts.googleapis.com/css2?family=Open+Sauce+Two:wght@100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Inter+Tight:wght@100..900&display=swap");
 
 :root {
-    --t-ff-h: "Headlines", sans-serif;
-    --t-ff-p: "Descriptions", sans-serif;
+    --t-ff-h: "Inter Tight", sans-serif;
+    --t-ff-p: "Inter", sans-serif;
     --t-lh-flat: 105%;
     --t-lh-dense: 120%;
     --t-lh-relaxed: 150%;
@@ -27,11 +27,14 @@ $max-ratio: 1.25;
 @function calc-fluid-size($step) {
     $min-size: $min-font-size * math.pow($min-ratio, $step);
     $max-size: $max-font-size * math.pow($max-ratio, $step);
-
     $slope: math.div($max-size - $min-size, $max-width - $min-width);
     $intercept: $min-size - $slope * $min-width;
 
-    @return clamp(#{math.div($min-size, 16)}rem, calc(#{$slope * 100}vi + #{math.div($intercept, 16)}rem), #{math.div($max-size, 16)}rem);
+    @return clamp(
+        #{math.div($min-size, 16)}rem,
+        calc(#{$slope * 100}vi + #{math.div($intercept, 16)}rem),
+        #{math.div($max-size, 16)}rem
+    );
 }
 
 $typography-properties: (
@@ -45,57 +48,26 @@ $typography-properties: (
 );
 
 $property-values: (
-    lh: (flat: var(--t-lh-flat),
-        dense: var(--t-lh-dense),
-        relaxed: var(--t-lh-relaxed)),
-    fw: (r: var(--t-fw-r),
-        m: var(--t-fw-m)),
-    ff: (p: var(--t-ff-p),
-        h: var(--t-ff-h)),
-    tt: (none: none,
-        uppercase: uppercase),
-    ta: (center: center,
-        left: left,
-        right: right),
-    tw: (pretty: pretty,
-        balance: balance,
-        nowrap: nowrap)
+    lh: (flat: var(--t-lh-flat), dense: var(--t-lh-dense), relaxed: var(--t-lh-relaxed)),
+    fw: (r: var(--t-fw-r), m: var(--t-fw-m)),
+    ff: (p: var(--t-ff-p), h: var(--t-ff-h)),
+    tt: (none: none, uppercase: uppercase),
+    ta: (center: center, left: left, right: right),
+    tw: (pretty: pretty, balance: balance, nowrap: nowrap)
 );
 
 $typography-steps: (
-    xs: (step: -2,
-        elements: (),
-        tokens: (lh-relaxed, fw-r, ff-p)),
-    s: (step: -1,
-        elements: (small),
-        tokens: (lh-relaxed, fw-r, ff-p)),
-    m: (step: 0,
-        elements: (p, a),
-        tokens: (lh-relaxed, fw-r, ff-p)),
-    l: (step: 1,
-        elements: (),
-        tokens: (lh-relaxed, fw-r, ff-p)),
-    xl: (step: 2,
-        elements: (),
-        tokens: (lh-dense, fw-r, ff-h)),
-    2xl: (step: 3,
-        elements: (h4),
-        tokens: (lh-dense, fw-m, ff-h)),
-    3xl: (step: 4,
-        elements: (h3),
-        tokens: (lh-dense, fw-m, ff-h)),
-    4xl: (step: 5,
-        elements: (h2),
-        tokens: (lh-dense, fw-m, ff-h)),
-    5xl: (step: 6,
-        elements: (h1),
-        tokens: (lh-dense, fw-m, ff-h)),
-    6xl: (step: 7,
-        elements: (),
-        tokens: (lh-dense, fw-m, ff-h)),
-    7xl: (step: 8,
-        elements: (),
-        tokens: (lh-dense, fw-m, ff-h))
+    xs: (step: -2, elements: (), tokens: (lh-relaxed, fw-r, ff-p)),
+    s: (step: -1, elements: (small), tokens: (lh-relaxed, fw-r, ff-p)),
+    m: (step: 0, elements: (p, a), tokens: (lh-relaxed, fw-r, ff-p)),
+    l: (step: 1, elements: (), tokens: (lh-relaxed, fw-r, ff-p)),
+    xl: (step: 2, elements: (), tokens: (lh-dense, fw-r, ff-h)),
+    2xl: (step: 3, elements: (h4), tokens: (lh-dense, fw-m, ff-h)),
+    3xl: (step: 4, elements: (h3), tokens: (lh-dense, fw-m, ff-h)),
+    4xl: (step: 5, elements: (h2), tokens: (lh-dense, fw-m, ff-h)),
+    5xl: (step: 6, elements: (h1), tokens: (lh-dense, fw-m, ff-h)),
+    6xl: (step: 7, elements: (), tokens: (lh-dense, fw-m, ff-h)),
+    7xl: (step: 8, elements: (), tokens: (lh-dense, fw-m, ff-h))
 );
 
 :root {
@@ -109,56 +81,55 @@ html, body {
     font-family: var(--t-ff-p);
 }
 
-
-
 @each $name, $config in $typography-steps {
     $elements: map.get($config, elements);
     $tokens: map.get($config, tokens);
 
     $selector: ".t-s-#{$name}";
 
-    @if length($elements)>0 {
-        $element-list: (
-        );
+    @if length($elements) > 0 {
+        $element-list: ();
 
-    @each $element in $elements {
-        $element-list: append($element-list, $element, comma);
+        @each $element in $elements {
+            $element-list: append($element-list, $element, comma);
+        }
+
+        $selector: "#{$element-list}, #{$selector}";
     }
 
-    $selector: "#{$element-list}, #{$selector}";
-}
+    #{$selector} {
+        font-size: var(--t-s-#{$name});
 
-#{$selector} {
-    font-size: var(--t-s-#{$name});
+        @each $token in $tokens {
+            $dash-index: str-index($token, "-");
 
-    @each $token in $tokens {
-        $dash-index: str-index($token, "-");
+            @if $dash-index {
+                $prop-key: str-slice($token, 1, $dash-index - 1);
+                $prop-value: str-slice($token, $dash-index + 1);
 
-        @if $dash-index {
-            $prop-key: str-slice($token, 1, $dash-index - 1);
-            $prop-value: str-slice($token, $dash-index + 1);
+                $values-map: map.get($property-values, $prop-key);
 
-            $values-map: map.get($property-values, $prop-key);
+                @if $values-map {
+                    $css-value: map.get($values-map, $prop-value);
 
-            @if $values-map {
-                $css-value: map.get($values-map, $prop-value);
-
-                @if $css-value {
-                    $css-property: map.get($typography-properties, $prop-key);
-                    #{$css-property}: #{$css-value};
+                    @if $css-value {
+                        $css-property: map.get($typography-properties, $prop-key);
+                        #{$css-property}: #{$css-value};
+                    }
                 }
             }
         }
     }
 }
-}
 
-@each $prop-key, $values-map in $property-values {
-    $css-property: map.get($typography-properties, $prop-key);
+@if $generate-typography-utilities {
+    @each $prop-key, $values-map in $property-values {
+        $css-property: map.get($typography-properties, $prop-key);
 
-    @each $value-key, $css-value in $values-map {
-        .t-#{$prop-key}-#{$value-key} {
-            #{$css-property}: #{$css-value};
+        @each $value-key, $css-value in $values-map {
+            .t-#{$prop-key}-#{$value-key} {
+                #{$css-property}: #{$css-value};
+            }
         }
     }
 }

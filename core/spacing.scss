@@ -1,30 +1,18 @@
 @use "sass:map";
 
+$generate-spacing-utilities: true !default;
+$spacing-utility-types: (p, m, g, mw) !default;
+
 $breakpoints: (
     "tablet": 991px,
     "mobile": 767px
 );
 
-@media only screen and (min-width: #{map.get($breakpoints, 'tablet') + 1px}) {
-    /* desktop */
-}
-
-@media only screen and (min-width: #{map.get($breakpoints, 'mobile') + 1px}) {
-    /* desktop and tablet */
-}
-
-@media only screen and (min-width: #{map.get($breakpoints, 'mobile') + 1px}) and (max-width: #{map.get($breakpoints, 'tablet')}) {
-    /* tablet */
-}
-
-@media only screen and (max-width: #{map.get($breakpoints, 'tablet')}) {
-    /* tablet and mobile */
-}
-
-@media only screen and (max-width: #{map.get($breakpoints, 'mobile')}) {
-    /* mobile */
-}
-
+@media only screen and (min-width: #{map.get($breakpoints, 'tablet') + 1px}) {}
+@media only screen and (min-width: #{map.get($breakpoints, 'mobile') + 1px}) {}
+@media only screen and (min-width: #{map.get($breakpoints, 'mobile') + 1px}) and (max-width: #{map.get($breakpoints, 'tablet')}) {}
+@media only screen and (max-width: #{map.get($breakpoints, 'tablet')}) {}
+@media only screen and (max-width: #{map.get($breakpoints, 'mobile')}) {}
 
 $spacing-sizes: (
     "nil": 0,
@@ -88,12 +76,6 @@ $spacing-sizes-mobile: (
 
 $max-width-sizes: (95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 25, 20, 15, 10, 5);
 
-@each $size in $max-width-sizes {
-    .sp-mw-#{$size} {
-        max-width: calc(#{$size * 0.01} * var(--sp-site-width));
-    }
-}
-
 $spacing-properties: (
     "p": "padding",
     "py": "padding-block",
@@ -112,31 +94,60 @@ $spacing-properties: (
     "g": "gap"
 );
 
-@each $size, $value in $spacing-sizes {
-    @each $prefix, $property in $spacing-properties {
-        .sp-#{$prefix}-#{$size} {
-            #{$property}: var(--sp-#{$size});
-        }
-    }
-}
+@if $generate-spacing-utilities {
 
-@media only screen and (max-width: #{map.get($breakpoints, 'tablet')}) {
     @each $size, $value in $spacing-sizes {
         @each $prefix, $property in $spacing-properties {
-            .sp-#{$prefix}-#{$size}-tablet-mobile {
-                #{$property}: var(--sp-#{$size});
+            @if index($spacing-utility-types, $prefix) or
+                (index($spacing-utility-types, p) and str-index($prefix, "p") == 1) or
+                (index($spacing-utility-types, m) and str-index($prefix, "m") == 1) {
+
+                .sp-#{$prefix}-#{$size} {
+                    #{$property}: var(--sp-#{$size});
+                }
+
             }
         }
     }
-}
 
-@media only screen and (max-width: #{map.get($breakpoints, 'mobile')}) {
-    @each $size, $value in $spacing-sizes {
-        @each $prefix, $property in $spacing-properties {
-            .sp-#{$prefix}-#{$size}-mobile {
-                #{$property}: var(--sp-#{$size});
+    @if index($spacing-utility-types, mw) {
+        @each $size in $max-width-sizes {
+            .sp-mw-#{$size} {
+                max-width: calc(#{$size * 0.01} * var(--sp-site-width));
             }
         }
     }
-}
 
+    @media only screen and (max-width: #{map.get($breakpoints, 'tablet')}) {
+        @each $size, $value in $spacing-sizes {
+            @each $prefix, $property in $spacing-properties {
+                @if index($spacing-utility-types, $prefix) or
+                    (index($spacing-utility-types, p) and str-index($prefix, "p") == 1) or
+                    (index($spacing-utility-types, m) and str-index($prefix, "m") == 1) {
+
+                    .sp-#{$prefix}-#{$size}-tablet-mobile {
+                        #{$property}: var(--sp-#{$size});
+                    }
+
+                }
+            }
+        }
+    }
+
+    @media only screen and (max-width: #{map.get($breakpoints, 'mobile')}) {
+        @each $size, $value in $spacing-sizes {
+            @each $prefix, $property in $spacing-properties {
+                @if index($spacing-utility-types, $prefix) or
+                    (index($spacing-utility-types, p) and str-index($prefix, "p") == 1) or
+                    (index($spacing-utility-types, m) and str-index($prefix, "m") == 1) {
+
+                    .sp-#{$prefix}-#{$size}-mobile {
+                        #{$property}: var(--sp-#{$size});
+                    }
+
+                }
+            }
+        }
+    }
+
+}

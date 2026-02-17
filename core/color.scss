@@ -1,3 +1,6 @@
+$generate-color-utilities: true !default;
+$color-utility-types: (c-el, c-bg, c-bor) !default;
+
 $colors: (
     "base-fg": #111111,
     "base-bg": #ffffff,
@@ -20,7 +23,7 @@ $opacities: (90, 80, 70, 60, 50, 40, 30, 20, 10, 5);
 
 $properties: (
     "c-el": "color",
-    "c-bg": "background-color", 
+    "c-bg": "background-color",
     "c-bor": "border-color"
 );
 
@@ -29,23 +32,38 @@ $properties: (
         --c-#{$name}: #{$color};
 
         @each $opacity in $opacities {
-            --c-#{$name}-#{$opacity}: rgba(#{red($color)}, #{green($color)}, #{blue($color)}, #{$opacity * 0.01});
+            --c-#{$name}-#{$opacity}: rgba(
+                #{red($color)},
+                #{green($color)},
+                #{blue($color)},
+                #{$opacity * 0.01}
+            );
         }
     }
 }
 
-@each $name, $color in $colors {
-    @each $prop-name, $css-property in $properties {
-        .#{$prop-name}-#{$name} {
-            #{$css-property}: var(--c-#{$name}) #{if($prop-name == "c-bor", !important, null)};
-        }
+@if $generate-color-utilities {
 
-        @each $opacity in $opacities {
-            .#{$prop-name}-#{$name}-#{$opacity} {
-                #{$css-property}: var(--c-#{$name}-#{$opacity}) #{if($prop-name == "c-bor", !important, null)};
+    @each $name, $color in $colors {
+        @each $prop-name, $css-property in $properties {
+
+            @if index($color-utility-types, $prop-name) {
+
+                .#{$prop-name}-#{$name} {
+                    #{$css-property}: var(--c-#{$name});
+                }
+
+                @each $opacity in $opacities {
+                    .#{$prop-name}-#{$name}-#{$opacity} {
+                        #{$css-property}: var(--c-#{$name}-#{$opacity});
+                    }
+                }
+
             }
+
         }
     }
+
 }
 
 $default-elements: (
